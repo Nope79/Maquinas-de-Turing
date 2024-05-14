@@ -1,0 +1,14 @@
+Es posible que se desfase la siguiente "tabla" si pone muchos datos, so, si pone muchos datos suerte interprentándolo porque yo no voy a investigar como evitarlo.
+
+CINTA                                     ORIGEN          C_LEÍDO FIN          C_ESCRITO          DIRECCIÓN
+<1>+1=1          QA          1          QA          1           R
+
+1<+>1=1          QA          +          QA          +           R
+
+1+<1>=1          QA          1          QA          1           R
+
+1+1<=>1          QA          =          QB          =           R
+
+1+1=<1>          Rompe en QB con el caracter 1 :(
+
+WA

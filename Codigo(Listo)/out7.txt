@@ -1,0 +1,8 @@
+Es posible que se desfase la siguiente "tabla" si pone muchos datos, so, si pone muchos datos suerte interprentándolo porque yo no voy a investigar como evitarlo.
+
+CINTA                                     ORIGEN          C_LEÍDO FIN          C_ESCRITO          DIRECCIÓN
+<1>8*32+8329=          QA          1          QA          1           R
+
+1<8>*32+8329=          QA          8          Rompe en QA con el caracter 8 :(
+
+WA

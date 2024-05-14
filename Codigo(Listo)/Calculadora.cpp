@@ -1,19 +1,73 @@
 #include <iostream>
 #include <fstream>
-#include <cctype>
 #include <vector>
-#include <string>
-
 // Nope79
+
+/*
+MÁQUINA DE TURING QUE PUEDE REALIZAR OPERACIONES BÁSICAS.
+SOLO RECIBE SECUENCIAS DE 1'S.
+LAS DIVISIONES DESPRECIAN DECIMALES.
+SON OPERACIONES SECUENCIALES, NO TOMA EN CUENTA LA JERARQUÍA DE OPERACIONES.
+
+EJEMPLOS DE CADENAS VALIDAS:
+111+111-111-111=
+1/1/1/1=
+1*111/11/111111111*1-1+1-1+1-1+1=
+
+EJEMPLOS DE CADENAS NO VALIDAS
+KADFSF=
+18*32+8329=
+11111
+1+1+1*1-1/1=1
+
+PARA REPRESENTAR LOS NODOS SE USA UN ENUMERADO.
+PARA REPRESENTAR LA CINTA SE USA UN VECTOR.
+TENEMOS UNA FUNCIÓN A LA QUE SE LE PASA LA CADENA A REVISAR Y SE REALIZA TODO EL PROCESO EN ESA ÚNICA FUNCIÓN.
+
+EXPLICACIÓN BÁSICA DEL ALGORITMO:
+AL INICIAR, SE REVISARÁ  QUE SE CUMPLA QUE LUEGO DEL SIGNO DE IGUAL NO HAYA NADA MÁS.
+Al TERMINAR, SE REVISARÁ QUE SE CUMPLA EL FORMATO: término, operación, término, operación, término, operación... término, signo_igual.
+
+SE CALCULA EL RESULTADO LUEGO DEL SIGNO DE IGUAL, POR LO TANTO, ES NECESARIO PASAR EL PRIMER TÉRMINO A LA DERECHA DEL MISMO, ESTO SE HACE SIEMPRE.
+CON TODAS LAS OPERACIONES SE HACE ESTO, EN LAS DIVISIONES SE NECESITA HACER UN REACOMODO DEBIDO A QUE EL RESULTADO SE COLOCA SEGUIDO EL RESULTADO ANTERIOR.
+
+LA SUMA Y RESTA SON MUY SIMILARES, POR SU PARTE, LA SUMA AÑADEN 1'S CUANDO SE HACE ADICIÓN A UN NÚMERO POSITIVO Y SE ELIMINAN CUANDO ESTE ES NEGATIVO.
+POR OTRO LADO, LA RESTA HACE ADICIÓN A UN NÚMERO NEGATIVO Y UNA EXTRACCIÓN CUANDO ES UN NÚMERO POSITIVO.
+¿PODRÍAN USARSE LOS MISMOS NODOS ENTONCES? NO. ☺
+
+LA MULTIPLICACIÓN ES UNA SECUENCIA DE SUMAS, ENTONCES, SOLO HACEMOS DICHAS ADICIONES, VAMOS MARCANDO LOS 1'S 
+DEL RESULTADO Y AÑADIENDO A LA VEZ MÁS EN RELACIÓN A LOS PRIMEROS, ESTO EN UN CICLO, N-1 VECES, DONDE
+N ES EL NÚMERO SEGUIDO DEL SIGNO *, ESTO PORQUE YA TENEMOS LA PRIMERA ADICIÓN HECHA SIEMPRE.
+
+LA DIVISIÓN ES ALGO MÁS COMPLEJA YA QUE REALIZA UN PROCESO PARECIDO AL DE LA MULTIPLICACIÓN, PERO DE FORMA INVERSA,
+EN ESTE CASO VERIFICAMOS CUANTAS VECES CABE X EN Y, SIENDO X EL NÚMERO SEGUIDO POR EL SIGNO /, Y SIENDO
+EL RESULTADO CALCULADO ANTES DE LA DIVISIÓN. VAMOS MARCANDO TANTO LOS VALORES DE X COMO LOS DE Y.
+AL INICIAR LO PRIMERO QUE SE HACE ES COLOCAR UN CARACTER CUALQUIERA AL FINAL DE TODA LA EXPRESIÓN PARA 
+GUARDAR EL RESULTADO LUEGO DE DICHO CARACTER.
+FINALMENTE, CUANDO SE TERMINA EL PROCESO PRINCIPAL, SE PROCEDE A RECORRERSE TODO EL RESULTADO HASTA EL SIGNO = 
+O - EN CASO DE TENER UN RESULTADO NEGATIVO.
+
+PARA HACER PRUEBAS DIFERENTES A LAS PROPUESTAS PUEDE MODIFICAR EL ARCHIVO TXT LLAMADO "in.txt".
+CADA LÍNEA ORIGINARÁ OTRO ARCHIVO TXT CON TODO EL PROCESO REALIZADO, AL FINAL TIENE EL VEREDICTO,
+AC PARA UNA CADENA QUE FUE ACEPTADA Y WA PARA UNA CADENA QUE FUE RECHAZADA.
+
+EN CASO DE ENCONTRAR ALGÚN ERROR CONTACTAR AL SIGUIENTE CORREO: nopesep@gmail.com
+TOME DE BASE EL ARCHIVO JFLAP ADJUNTO Y REALICE LAS MISMAS PRUEBAS QUE AL CÓDIGO PARA SABER SI ES UN PROBLEMA 
+ÚNICO DEL CÓDIGO O ES ALGO QUE REQUIERE CORREGIR TODO.
+*/
 
 using namespace std;
 
-enum class Estado {q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, q21, q22, q23, q24, q25,
-q26, q27, q28, q29, q30, q31, q32, q33, q34, q35, q36, q37, q38, q39, q40, q41, q42, q43, q44, q45, q46, q47, q48, q49, q50, q51, q52, q53, q54, q55, q56, q57, q58, WA};
+enum class Estado {q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12, q13, q14, q15, q16, q17, q18, q19, q20, 
+q21, q22, q23, q24, q25, q26, q27, q28, q29, q30, q31, q32, q33, q34, q35, q36, q37, q38, q39, q40, 
+q41, q42, q43, q44, q45, q46, q47, q48, q49, q50, q51, q52, q53, q54, q55, q56, q57, q58, WA, qa, qb, qc};
 
 Estado analisis(vector <char>& v, ofstream& out);
 
 int main(){
+	
+	char lk = 1;
+	cout << lk;
 	
 	vector <char> v;
 	ifstream in;
@@ -34,7 +88,7 @@ int main(){
         std::ofstream out(filename);
         
         out << "Es posible que se desfase la siguiente \"tabla\" si pone muchos datos, so, si pone muchos datos suerte interprentándolo porque yo no voy a investigar como evitarlo.";
-        out << "\n\nCINTA                    ORIGEN     C_LEÍDO     C_ESCRITO     FIN     DIRECCIÓN\n";
+        out << "\n\nCINTA                                     ORIGEN          C_LEÍDO FIN          C_ESCRITO          DIRECCIÓN\n";
         
         string texto;
         getline(in, texto);
@@ -74,7 +128,7 @@ int main(){
 
 Estado analisis(vector <char>& v, ofstream& out){
 	
-	Estado actual = Estado::q0;
+	Estado actual = Estado::qa;
 	int pos = 3;
 	bool ban = true;
 	
@@ -96,6 +150,65 @@ Estado analisis(vector <char>& v, ofstream& out){
 		out << "          ";
 		
 		switch(actual){
+			
+			case Estado::qa:
+				
+				out << "QA          " << v[pos] << "          ";
+				
+				if(c == '1' || c == '*' || c == '/' || c == '+'  || c == '-'){
+			
+					out << "QA          " << v[pos] << "           R\n";
+					pos++;
+				}
+				
+				else if(c == '='){
+					
+					out << "QB          " << v[pos] << "           R\n";
+					actual = Estado::qb;
+					pos++;
+				}else{
+					
+					out << "Rompe en QA con el caracter " << v[pos] << " :(\n";
+					ban = false;
+				}
+				
+			break;
+			
+			case Estado::qb:
+				
+				if(c == 1){
+					
+					out << "QC          " << v[pos] << "           L\n";
+					pos--;
+					actual = Estado::qc;
+				}else{
+					
+					out << "Rompe en QB con el caracter " << v[pos] << " :(\n";
+					ban = false;
+				}
+				
+			break;
+			
+			case Estado::qc:
+				
+				if(c == '=' || c == '+' || c == '-' || c == '*' || c == '/' || c == '1'){
+					
+					out << "QC          " << v[pos] << "           L\n";
+					pos--;
+				}
+				
+				else if(c == 1){
+					
+					out << "Q0          " << v[pos] << "           L\n";
+					actual = Estado::q0;
+					pos++;
+				}else{
+					
+					out << "Rompe en QC con el caracter " << v[pos] << " :(\n";
+					ban = false;
+				}
+				
+			break;
 			
 			case Estado::q0:
 				
